@@ -10,9 +10,9 @@ namespace MarianaTeixeira.DialogueSystem
         [SerializeField] TMP_Text _dialogue;
         [SerializeField] RawImage _portrait;
 
-        public void ToggleCanvasVisibility()
+        public void ToggleCanvasVisibility(bool toggle)
         {
-            if (gameObject.activeSelf == true) gameObject.SetActive(false);
+            if (toggle == false) gameObject.SetActive(false);
             else gameObject.SetActive(true);
         }
 
@@ -30,5 +30,4 @@ namespace MarianaTeixeira.DialogueSystem
             _portrait.texture = null;
         }
     }
-
 }

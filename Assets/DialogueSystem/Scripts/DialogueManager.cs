@@ -8,17 +8,17 @@ namespace MarianaTeixeira.DialogueSystem
         [SerializeField] DialogueCanvasManager _canvasManager;
         DialogueCanvasElements[] _dialogueArray;
         int _dialogueArrayIndex;
-        bool _currentlyDialogue;
 
         private void OnEnable()
         {
-            DialogueInteractions.onDialogueLoad += OnLoadDialogue;
             DialogueInteractions.onDialogueUpdate += OnDialoguePress;
+            DialogueInteractions.onDialogueEnd += OnDialogueEnd;
         }
+
         private void OnDisable()
         {
-            DialogueInteractions.onDialogueLoad -= OnLoadDialogue;
             DialogueInteractions.onDialogueUpdate -= OnDialoguePress;
+            DialogueInteractions.onDialogueEnd -= OnDialogueEnd;
         }
 
         #region Loading DialogueArray
@@ -74,38 +74,32 @@ namespace MarianaTeixeira.DialogueSystem
         }
 
 
-        void OnDialoguePress()
+        void OnDialoguePress(DialogueGraphData saveData)
         {
+            if (_dialogueArray == null) OnDialogueStart(saveData);
+
             bool haveDialogueLeft = _dialogueArrayIndex < _dialogueArray.Length;
 
-            if (!_currentlyDialogue)
-                StartDialogue();
-            else if (haveDialogueLeft)
-                NextDialogue();
+            if (haveDialogueLeft)
+                CallUpdateCanvas();
             else
-                EndDialogue();
+                OnDialogueEnd();
 
             _dialogueArrayIndex++;
         }
 
-        void StartDialogue()
+        void OnDialogueStart(DialogueGraphData saveData)
         {
-            _canvasManager.ToggleCanvasVisibility();
+            _canvasManager.ToggleCanvasVisibility(true);
             _dialogueArrayIndex = 0;
-            _currentlyDialogue = true;
-            CallUpdateCanvas();
+            LoadDialogueArray(saveData);
         }
 
-        void NextDialogue()
+        void OnDialogueEnd()
         {
-            CallUpdateCanvas();
-        }
-
-        void EndDialogue()
-        {
-            _canvasManager.ToggleCanvasVisibility();
+            _canvasManager.ToggleCanvasVisibility(false);
             _canvasManager.ResetCanvas();
-            _currentlyDialogue = false;
+            _dialogueArray = null;
         }
 
         void CallUpdateCanvas()
@@ -116,5 +110,4 @@ namespace MarianaTeixeira.DialogueSystem
             _canvasManager.UpdateCanvas(name, dialogue, portrait);
         }
     }
-
 }
