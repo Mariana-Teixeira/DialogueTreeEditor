@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2205641083542782362}
-  - component: {fileID: 2205641083542782360}
   - component: {fileID: 2205641083542782361}
+  - component: {fileID: 2205641083542782360}
   m_Layer: 0
   m_Name: CharacterExample
   m_TagString: Untagged
@@ -33,6 +33,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2205641083542782361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2205641083542782363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54fdbbaad927c644692c44a2f7773f3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _canvasManager: {fileID: 0}
 --- !u!114 &2205641083542782360
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47,16 +60,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _dialogueDatas:
   - {fileID: 11400000, guid: 19e599c5803e45d499a8bd1218264cec, type: 2}
---- !u!114 &2205641083542782361
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2205641083542782363}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54fdbbaad927c644692c44a2f7773f3b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _canvasManager: {fileID: 0}

@@ -1,0 +1,33 @@
+DialogueNode
+{
+    width: 300px;
+    height: auto;
+}
+
+.Container
+{
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    align-items: stretch;
+}
+
+#CharacterName
+{
+    width: 75%;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;
+}
+
+#PortraitImage
+{
+    max-height: 300px;
+}
+
+#DialogueText
+{
+    width: 100%;
+    white-space: normal;
+}

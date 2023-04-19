@@ -308,6 +308,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2205641083542782360, guid: 7d78d42d3085fc740882f594f274e891, type: 3}
+      propertyPath: _dialogueDatas.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2205641083542782361, guid: 7d78d42d3085fc740882f594f274e891, type: 3}
       propertyPath: _canvasManager
       value: 

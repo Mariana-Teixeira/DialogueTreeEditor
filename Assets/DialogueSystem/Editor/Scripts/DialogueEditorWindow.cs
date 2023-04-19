@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace MarianaTeixeira.DialogueSystem
@@ -9,25 +12,18 @@ namespace MarianaTeixeira.DialogueSystem
     public class DialogueEditorWindow : EditorWindow
     {
         DialogueGraphView _graphView;
+        List<DialogueGraphData> saveDialogueData;
         string _fileName = "Default";
 
         [MenuItem("Tools/Dialogue Window")]
         public static void ShowWindow()
         {
-            GetWindow<DialogueEditorWindow>("DialogueWindow");
+            GetWindow<DialogueEditorWindow>("Dialogue Editor");
         }
 
         public void CreateGUI()
         {
             #region Instantiate DialogueGraph Data
-
-            var containerGuids = AssetDatabase.FindAssets("t:DialogueContainer");
-            var containerList = new List<DialogueGraphData>();
-
-            foreach (var guid in containerGuids)
-            {
-                containerList.Add(AssetDatabase.LoadAssetAtPath<DialogueGraphData>(AssetDatabase.GUIDToAssetPath(guid)));
-            }
 
             #endregion
 
@@ -37,12 +33,41 @@ namespace MarianaTeixeira.DialogueSystem
 
             TextField filenameField = new TextField() { value = _fileName };
             filenameField.RegisterValueChangedCallback(evt => _fileName = evt.newValue);
+            toolbar.Add(filenameField);
+
+            #endregion
+
+            #region Create SplitView
+
+            var splitView = new TwoPaneSplitView(0, 150, TwoPaneSplitViewOrientation.Horizontal);
+            rootVisualElement.Add(splitView);
+
+            // Create Dialogue GraphView
+
+            _graphView = new DialogueGraphView();
+            splitView.Add(_graphView);
+            _graphView.UpdateViewTransform(UnityEngine.Vector3.zero, UnityEngine.Vector3.one);
+
+            // Create Dialogue Data List View
+            ListView listView = CreateList(filenameField);
+            splitView.Insert(0, listView);
+
+            #endregion
+
+            #region Add Buttons to Toolbar
 
             Button clearButton = new Button(() => ClearData()) { text = "Clear" };
-            Button saveButton = new Button(() => SaveData()) { text = "Save" };
+
+            Button saveButton = new Button(() =>
+            {
+                SaveData();
+                rootVisualElement.Remove(splitView);
+                listView = CreateList(filenameField);
+                rootVisualElement.Insert(0, splitView);
+            }) { text = "Save" };
+
             Button loadButton = new Button(() => LoadData()) { text = "Load" };
 
-            toolbar.Add(filenameField);
             toolbar.Add(saveButton);
             toolbar.Add(loadButton);
             toolbar.Add(clearButton);
@@ -51,18 +76,17 @@ namespace MarianaTeixeira.DialogueSystem
 
             #endregion
 
-            #region Create SplitView
-            var splitView = new TwoPaneSplitView(0, 150, TwoPaneSplitViewOrientation.Horizontal);
-            rootVisualElement.Add(splitView);
+            AddStyles();
+        }
 
-            // Create Dialogue Data List View
-
-            var listView = new ListView();
-            splitView.Add(listView);
+        ListView CreateList(TextField filenameField)
+        {
+            ListView listView = new ListView();
+            SetListValues(listView);
 
             listView.makeItem = () => new Label();
-            listView.bindItem = (item, index) => { (item as Label).text = containerList[index].name; };
-            listView.itemsSource = containerList;
+            listView.bindItem = (item, index) => { (item as Label).text = saveDialogueData[index].name; };
+            listView.itemsSource = saveDialogueData;
 
             listView.onSelectionChange += (IEnumerable<object> selectedItems) =>
             {
@@ -70,11 +94,18 @@ namespace MarianaTeixeira.DialogueSystem
                 filenameField.value = selectedFile.name;
             };
 
-            // Create Dialogue GraphView
+            return listView;
+        }
 
-            _graphView = new DialogueGraphView();
-            splitView.Add(_graphView);
-            #endregion
+        void SetListValues(ListView listView)
+        {
+            var containerGuids = AssetDatabase.FindAssets("t:DialogueGraphData");
+            saveDialogueData = new List<DialogueGraphData>();
+
+            foreach (var guid in containerGuids)
+            {
+                saveDialogueData.Add(AssetDatabase.LoadAssetAtPath<DialogueGraphData>(AssetDatabase.GUIDToAssetPath(guid)));
+            }
         }
 
         #region Saving and Loading Functions
@@ -96,5 +127,15 @@ namespace MarianaTeixeira.DialogueSystem
         }
 
         #endregion
+
+        private void AddStyles()
+        {
+            StyleSheet windowStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/DialogueSystem/Styles/WindowStyle.uss");
+            rootVisualElement.styleSheets.Add(windowStyle);
+            StyleSheet graphViewStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/DialogueSystem/Styles/GraphStyle.uss");
+            _graphView.styleSheets.Add(graphViewStyle);
+            StyleSheet nodeStyle = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/DialogueSystem/Styles/NodeStyle.uss");
+            _graphView.styleSheets.Add(nodeStyle);
+        }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace MarianaTeixeira.DialogueSystem
@@ -10,9 +11,8 @@ namespace MarianaTeixeira.DialogueSystem
     {
         public DialogueGraphView()
         {
-            AddManipulators();
             AddGridBackground();
-            AddStyles();
+            AddManipulators();
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
@@ -31,6 +31,7 @@ namespace MarianaTeixeira.DialogueSystem
         private void AddManipulators()
         {
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
+
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
 
@@ -43,16 +44,22 @@ namespace MarianaTeixeira.DialogueSystem
                 (
                 menuEvent => menuEvent.menu.AppendAction
                     (
-                        "Add Node", actionEvent => AddElement(CreateNode())
+                        "Add Node", actionEvent => AddElement(CreateNode(
+                            GetLocalMousePosition(actionEvent.eventInfo.localMousePosition)))
                     )
                 );
 
             return contextualMenuManipulator;
         }
 
-        public DialogueNode CreateNode()
+        public Vector2 GetLocalMousePosition(Vector2 mousePosition)
         {
-            DialogueNode node = new DialogueNode();
+            return contentViewContainer.WorldToLocal(mousePosition);
+        }
+
+        public DialogueNode CreateNode(Vector2 position)
+        {
+            DialogueNode node = new DialogueNode(position);
             node.CreateNode();
 
             return node;
@@ -64,14 +71,6 @@ namespace MarianaTeixeira.DialogueSystem
             grid.StretchToParentSize();
 
             Insert(0, grid);
-        }
-
-        private void AddStyles()
-        {
-            StyleSheet graphViewStyle = (StyleSheet)EditorGUIUtility.Load("WindowStyle.uss");
-            StyleSheet nodeStyle = (StyleSheet)EditorGUIUtility.Load("NodeStyle.uss");
-            styleSheets.Add(graphViewStyle);
-            styleSheets.Add(nodeStyle);
         }
     }
 

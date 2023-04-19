@@ -1,0 +1,14 @@
+TextField
+{
+	width: 20%;
+}
+
+ListView
+{
+	background-color: #4287f5;
+}
+
+Label
+{
+	-unity-text-align: middle-center;
+}

@@ -45,10 +45,10 @@ namespace MarianaTeixeira.DialogueSystem
                 });
             }
 
-            if (!AssetDatabase.IsValidFolder($"Assets/Resources"))
-                AssetDatabase.CreateFolder("Assets", "Resources");
+            if (!AssetDatabase.IsValidFolder($"Assets/DialogueSystem/SaveFiles"))
+                AssetDatabase.CreateFolder("Assets/DialogueSystem", "SaveFiles");
 
-            AssetDatabase.CreateAsset(s_graphData, $"Assets/Resources/{fileName}.asset");
+            AssetDatabase.CreateAsset(s_graphData, $"Assets/DialogueSystem/SaveFiles/{fileName}.asset");
             AssetDatabase.SaveAssets();
         }
 
@@ -69,7 +69,8 @@ namespace MarianaTeixeira.DialogueSystem
 
         public static void LoadGraphData(DialogueGraphView graphView, string fileName)
         {
-            s_graphData = Resources.Load<DialogueGraphData>(fileName);
+            //s_graphData = Resources.Load<DialogueGraphData>(fileName);
+            s_graphData = AssetDatabase.LoadAssetAtPath<DialogueGraphData>($"Assets/DialogueSystem/SaveFiles/{fileName}.asset");
             if (s_graphData == null) return;
 
             // Load nodes to GraphView
