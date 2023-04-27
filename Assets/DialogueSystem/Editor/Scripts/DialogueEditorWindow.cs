@@ -12,8 +12,12 @@ namespace MarianaTeixeira.DialogueSystem
     public class DialogueEditorWindow : EditorWindow
     {
         DialogueGraphView _graphView;
-        List<DialogueGraphData> saveDialogueData;
-        string _fileName = "Default";
+
+        TextField _saveFileField;
+        string _fileName;
+
+        ObjectField _loadObjectField;
+        DialogueGraphData _saveData;
 
         [MenuItem("Tools/Dialogue Window")]
         public static void ShowWindow()
@@ -23,107 +27,87 @@ namespace MarianaTeixeira.DialogueSystem
 
         public void CreateGUI()
         {
-            #region Instantiate DialogueGraph Data
-
-            #endregion
-
-            #region Create Toolbar
-
             Toolbar toolbar = new Toolbar();
 
-            TextField filenameField = new TextField() { value = _fileName };
-            filenameField.RegisterValueChangedCallback(evt => _fileName = evt.newValue);
-            toolbar.Add(filenameField);
-
-            #endregion
-
-            #region Create SplitView
-
-            var splitView = new TwoPaneSplitView(0, 150, TwoPaneSplitViewOrientation.Horizontal);
-            rootVisualElement.Add(splitView);
-
-            // Create Dialogue GraphView
-
-            _graphView = new DialogueGraphView();
-            splitView.Add(_graphView);
-            _graphView.UpdateViewTransform(UnityEngine.Vector3.zero, UnityEngine.Vector3.one);
-
-            // Create Dialogue Data List View
-            ListView listView = CreateList(filenameField);
-            splitView.Insert(0, listView);
-
-            #endregion
-
-            #region Add Buttons to Toolbar
+            _saveFileField = new TextField() { value = _fileName };
+            _saveFileField.RegisterValueChangedCallback(evt => _fileName = evt.newValue);
 
             Button clearButton = new Button(() => ClearData()) { text = "Clear" };
-
-            Button saveButton = new Button(() =>
-            {
-                SaveData();
-                rootVisualElement.Remove(splitView);
-                listView = CreateList(filenameField);
-                rootVisualElement.Insert(0, splitView);
-            }) { text = "Save" };
-
+            clearButton.name = "ClearButton";
+            Button saveButton = new Button(() => SaveData()) { text = "Save" };
             Button loadButton = new Button(() => LoadData()) { text = "Load" };
 
-            toolbar.Add(saveButton);
-            toolbar.Add(loadButton);
-            toolbar.Add(clearButton);
-
-            rootVisualElement.Add(toolbar);
-
-            #endregion
-
-            AddStyles();
-        }
-
-        ListView CreateList(TextField filenameField)
-        {
-            ListView listView = new ListView();
-            SetListValues(listView);
-
-            listView.makeItem = () => new Label();
-            listView.bindItem = (item, index) => { (item as Label).text = saveDialogueData[index].name; };
-            listView.itemsSource = saveDialogueData;
-
-            listView.onSelectionChange += (IEnumerable<object> selectedItems) =>
+            _loadObjectField = new ObjectField()
             {
-                var selectedFile = selectedItems.First() as DialogueGraphData;
-                filenameField.value = selectedFile.name;
+                objectType = typeof(DialogueGraphData),
             };
 
-            return listView;
-        }
-
-        void SetListValues(ListView listView)
-        {
-            var containerGuids = AssetDatabase.FindAssets("t:DialogueGraphData");
-            saveDialogueData = new List<DialogueGraphData>();
-
-            foreach (var guid in containerGuids)
+            _loadObjectField.RegisterValueChangedCallback(evt =>
             {
-                saveDialogueData.Add(AssetDatabase.LoadAssetAtPath<DialogueGraphData>(AssetDatabase.GUIDToAssetPath(guid)));
-            }
+                _saveData = evt.newValue as DialogueGraphData;
+            });
+
+            VisualElement save = new VisualElement();
+            save.Add(saveButton);
+            save.Add(_saveFileField);
+
+            VisualElement load = new VisualElement();
+            load.Add(loadButton);
+            load.Add(_loadObjectField);
+
+            toolbar.Add(save);
+            toolbar.Add(load);
+            toolbar.Add(clearButton);
+            rootVisualElement.Add(toolbar);
+
+            _graphView = new DialogueGraphView();
+            _graphView.StretchToParentSize();           
+            
+            rootVisualElement.Add(_graphView);
+            rootVisualElement.Add(toolbar);
+
+            AddStyles();
         }
 
         #region Saving and Loading Functions
 
         private void ClearData()
         {
+            _saveFileField.value = string.Empty;
+            _loadObjectField.value = null;
+
             DialogueSaveData.ClearGraph(_graphView);
         }
 
         private void LoadData()
         {
             DialogueSaveData.ClearGraph(_graphView);
-            DialogueSaveData.LoadGraphData(_graphView, _fileName);
+            _saveFileField.value = _loadObjectField.value.name;
+
+            string message;
+            bool isLoaded = DialogueSaveData.TryLoadData(_graphView, _saveData, out message);
+
+            if (!isLoaded)
+            {
+                EditorUtility.DisplayDialog(
+                    "Failed Load",
+                    message,
+                    "Okay");
+            }
         }
 
         private void SaveData()
         {
-            DialogueSaveData.SaveGraphData(_graphView, _fileName);
+            string message;
+            bool isDataSave = DialogueSaveData.TrySaveData(_graphView, _fileName, out message);
+            
+            if (!isDataSave)
+            {
+                EditorUtility.DisplayDialog(
+                    "Failed Save",
+                    message,
+                    "Okay");
+            }
         }
 
         #endregion

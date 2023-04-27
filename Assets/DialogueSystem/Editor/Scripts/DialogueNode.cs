@@ -75,8 +75,12 @@ namespace MarianaTeixeira.DialogueSystem
 
             ObjectField portraitField = new ObjectField("Character Portrait")
             {
-                objectType = typeof(Texture2D)
+                objectType = typeof(Texture2D),
+                value = CharacterPortrait,
             };
+
+            if (portraitField.value != null)
+                portraitImage.image = portraitField.value as Texture;
 
             portraitField.RegisterValueChangedCallback(evt =>
             {

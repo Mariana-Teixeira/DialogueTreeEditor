@@ -1,14 +1,17 @@
 TextField
 {
-	width: 20%;
+	width: 200px;
 }
 
-ListView
+Toolbar
 {
-	background-color: #4287f5;
+	height: 45px;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
 }
 
-Label
+#ClearButton
 {
-	-unity-text-align: middle-center;
+	align-self: stretch;
 }

@@ -10,7 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8c836bdc22fbfd4293d501308540ab0, type: 3}
-  m_Name: Default003
+  m_Name: "Di\xE1logo001"
   m_EditorClassIdentifier: 
-  NodesData: []
+  NodesData:
+  - ID: 5015f9c0-ed25-468f-8f06-a81e8656a08c
+    Name: Mariana
+    Dialogue: "Di\xE1logo"
+    Portrait: {fileID: 2800000, guid: 4b95c11d492599b4197fabff12393175, type: 3}
+    Position:
+      serializedVersion: 2
+      x: 294.4
+      y: 152
+      width: 300.00003
+      height: 434.40002
   LinksData: []
